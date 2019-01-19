@@ -27,17 +27,16 @@ class Contato {
     }
     
     // Listar um contato específico.
-    public function getNome($email){
-        $sql = "select nome from contatos where email = :email;";
+    public function getInfo($id){
+        $sql = "select * from contatos where id = :id;";
         $sql = $this->pdo->prepare($sql);
-        $sql->bindValue(':email', $email);
+        $sql->bindValue(':id', $id);
         $sql->execute();
 
         if ($sql->rowCount() > 0) {
-            $info = $sql->fetch();
-            return $info['nome'];
+            return $sql->fetch();
         } else {
-            return '';
+            return '<h1>Nenhum contato adicionado.</h1>';
         }
     }
     
@@ -55,11 +54,11 @@ class Contato {
     
     // Editar contato.
     public function edit($nome, $email, $id){
-        if($this->existContact($id)){
+        if (!$this->hasEmail($email)) {
             $sql = "update contatos set nome = :nome, email = :email where id = :id;";
-            $sql = $this->pdo->prepare($sql);      
+            $sql = $this->pdo->prepare($sql);       
             $sql->bindValue(':nome', $nome);
-            $sql->bindValue(':email', $email);
+            $sql->bindValue(':email', $email);       
             $sql->bindValue(':id', $id);
             $sql->execute();
             return true;
@@ -69,16 +68,11 @@ class Contato {
     }
     
     // Remover contato.
-    public function delete($email) {
-        if($this->hasEmail($email)){
-            $sql = "delete from contatos where email = :email;";
-            $sql = $this->pdo->prepare($sql);
-            $sql->bindValue(':email', $email);
-            $sql->execute();
-            return true;            
-        } else {
-            return false;
-        }
+    public function delete($id) {
+        $sql = "delete from contatos where id = :id;";
+        $sql = $this->pdo->prepare($sql);
+        $sql->bindValue(':id', $id);
+        $sql->execute();
     }
 
     private function hasEmail($email){
@@ -94,17 +88,4 @@ class Contato {
         }
     }
     
-    private function existContact($id){
-        $sql = "select * from contatos where id = :id;";
-        $sql = $this->pdo->prepare($sql);
-        $sql->bindValue(':id', $id);
-        $sql->execute();
-        
-        if($sql->rowCount() > 0){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 }
